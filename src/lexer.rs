@@ -2,7 +2,7 @@ use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum ExpressionType {
     Number,    // Number constant
     Symbol,    // Symbol constant, such as LOOP / END etc.
@@ -97,15 +97,13 @@ pub fn run_lexer(file_path: String) {
             curr_token = (ExpressionType::Error, "0".to_string());
         }
         let (token, val) = curr_token;
-        if token == ExpressionType::Operation{
-            if val == "@"{
+        if token == ExpressionType::Operation {
+            if val == "@" {
                 // A instruction
-            }
-            else if val == "("{
+            } else if val == "(" {
                 // L instruction
             }
-        }
-        else{
+        } else {
             // C instruction
         }
     }
