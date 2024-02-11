@@ -1,6 +1,8 @@
 mod assembler;
 mod lexer;
 mod parser;
+mod symboltable;
 fn main() {
-    assembler::assemble("/home/sh4dy/Desktop/nand2tetris/Assembler.hack/tests/programs/Add.asm".to_string());
+    let mut asm = assembler::Assembler::new();
+    asm.assemble("/home/sh4dy/Desktop/nand2tetris/Assembler.hack/tests/programs/Add.asm".to_string());
 }

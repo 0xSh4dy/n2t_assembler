@@ -2,7 +2,7 @@ use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-#[derive(Debug, PartialEq,Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ExpressionType {
     Number,    // Number constant
     Symbol,    // Symbol constant, such as LOOP / END etc.
@@ -12,51 +12,49 @@ pub enum ExpressionType {
 
 #[derive(PartialEq)]
 
-
-pub struct Lexer{
-    pub tokens:Vec<Vec<(ExpressionType,String)>>,
-    pub curr_instr_tokens:Vec<(ExpressionType,String)>,
-    pub curr_token:(ExpressionType,String),
+pub struct Lexer {
+    pub tokens: Vec<Vec<(ExpressionType, String)>>,
+    pub curr_instr_tokens: Vec<(ExpressionType, String)>,
+    pub curr_token: (ExpressionType, String),
 }
 
-impl Lexer{
-    pub fn new(file_path:String)->Lexer{
-        Lexer{
-            tokens:tokenize(file_path.clone()).unwrap(),
-            curr_instr_tokens:Vec::new(),
-            curr_token:(ExpressionType::Error,"".to_string()),
+impl Lexer {
+    pub fn new(file_path: String) -> Lexer {
+        Lexer {
+            tokens: tokenize(file_path.clone()).unwrap(),
+            curr_instr_tokens: Vec::new(),
+            curr_token: (ExpressionType::Error, "".to_string()),
         }
     }
 
-    pub fn has_more_instructions(&self)->bool{
+    pub fn has_more_instructions(&self) -> bool {
         !self.tokens.is_empty()
     }
 
-    pub fn next_instruction(&mut self)->Vec<(ExpressionType, String)>{
+    pub fn next_instruction(&mut self) -> Vec<(ExpressionType, String)> {
         self.curr_instr_tokens = self.tokens.remove(0);
         self.next_token();
         self.curr_instr_tokens.clone()
     }
 
-    pub fn next_token(&mut self)->(ExpressionType,String){
-        if self.has_next_token(){
+    pub fn next_token(&mut self) -> (ExpressionType, String) {
+        if self.has_next_token() {
             self.curr_token = self.curr_instr_tokens.remove(0);
-        }
-        else{
-            self.curr_token = (ExpressionType::Error,"".to_string())
+        } else {
+            self.curr_token = (ExpressionType::Error, "".to_string())
         }
         self.curr_token.clone()
     }
 
-    fn has_next_token(&self)->bool{
+    fn has_next_token(&self) -> bool {
         !self.curr_instr_tokens.is_empty()
     }
 
-    pub fn peek_token(&self)->(ExpressionType,String){
-        if self.has_next_token(){
+    pub fn peek_token(&self) -> (ExpressionType, String) {
+        if self.has_next_token() {
             return self.curr_instr_tokens[0].clone();
         }
-        return (ExpressionType::Error,"".to_string());
+        return (ExpressionType::Error, "".to_string());
     }
 }
 
@@ -127,23 +125,4 @@ fn tokenize(file_path: String) -> Result<Vec<Vec<(ExpressionType, String)>>, std
         tokens.push(line_tokens);
     }
     Ok(tokens)
-}
-
-fn get_tokens(file_path: String) -> Result<Vec<Vec<(ExpressionType, String)>>, std::io::Error> {
-    let tokens = tokenize(file_path);
-    return tokens;
-}
-
-fn peek_token(curr_instr_tokens:&Vec<(ExpressionType,String)>)->(ExpressionType,String){
-    if curr_instr_tokens.is_empty(){
-        return (ExpressionType::Error,"0".to_string());
-    }
-    curr_instr_tokens[0].clone()
-}
-
-pub fn run_lexer(file_path: String) {
-    let mut tokens: Vec<Vec<(ExpressionType, String)>> = get_tokens(file_path).unwrap();
-   loop{
-
-   }
 }

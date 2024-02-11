@@ -1,20 +1,20 @@
 use super::lexer::{ExpressionType, Lexer};
 pub struct Parser {
     pub new_lexer: Lexer,
-    instruction_info: InstructionInfo,
+    pub instruction_info: InstructionInfo,
 }
 
-#[derive(PartialEq)]
-enum InstructionType {
+#[derive(PartialEq, Clone)]
+pub enum InstructionType {
     AInstruction,
     CInstruction,
     LInstruction,
     InvalidInstruction,
 }
 
-struct InstructionInfo {
-    instruction_type: InstructionType,
-    symbol: String,
+pub struct InstructionInfo {
+    pub instruction_type: InstructionType,
+    pub symbol: String,
     dest: String,
     comp: String,
     jump: String,
@@ -51,6 +51,35 @@ impl Parser {
     fn c_instruction(&mut self, token: ExpressionType, value: String) {
         self.instruction_info.instruction_type = InstructionType::CInstruction;
         let (comp_tok, comp_val) = self.get_dest(token, value);
+        self.get_comp(comp_tok, comp_val);
+        self.get_jump();
+    }
+
+    fn get_comp(&mut self, token: ExpressionType, value: String) {
+        if token == ExpressionType::Operation && (value == "-" || value == "!") {
+            let (_, val2) = self.new_lexer.next_token();
+            let mut temp_str = String::new();
+            temp_str.push_str(value.as_str());
+            temp_str.push_str(val2.as_str());
+            self.instruction_info.comp = temp_str.clone();
+        } else if token == ExpressionType::Number || token == ExpressionType::Symbol {
+            self.instruction_info.comp = value;
+            let (tok2, val2) = self.new_lexer.peek_token();
+            if tok2 == ExpressionType::Operation && val2 != ";" {
+                self.new_lexer.next_token();
+                let (_, val3) = self.new_lexer.next_token();
+                self.instruction_info.comp.push_str(val2.as_str());
+                self.instruction_info.comp.push_str(val3.as_str());
+            }
+        }
+    }
+
+    fn get_jump(&mut self) {
+        let (token, value) = self.new_lexer.next_token();
+        if token == ExpressionType::Operation && value == ";" {
+            let (_, jump_val) = self.new_lexer.next_token();
+            self.instruction_info.jump = jump_val.clone();
+        }
     }
 
     fn get_dest(&mut self, token: ExpressionType, value: String) -> (ExpressionType, String) {
